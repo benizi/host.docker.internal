@@ -118,7 +118,9 @@ loop_stats() {
       case "$STATS" in
         (0) sleep 1h ;;
         (*)
-          iptables -t nat -L PREROUTING -v |
+          for chain in PREROUTING POSTROUTING
+          do iptables -t nat -L $chain -v
+          done |
           sed "s/^/$(date +"%F %T") /" >&2
           sleep $STATS
           ;;
