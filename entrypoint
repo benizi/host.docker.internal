@@ -90,6 +90,18 @@ start_forwarding() {
   done
 }
 
+# masquerade outgoing address to handle traffic that comes back through
+allow_hairpin() {
+  for proto in tcp udp
+  do
+    iptables \
+      --table nat \
+      --insert POSTROUTING \
+      --protocol $proto \
+      --jump MASQUERADE
+  done
+}
+
 # print environment if either `$DEBUG` or `$DEBUG_ENV` is set
 debug_env() {
   test -z "$DEBUG$DEBUG_ENV" || env | sort >&2
@@ -120,6 +132,7 @@ main() {
   ensure_caps cap_net_admin cap_net_raw
   set_destination
   start_forwarding
+  allow_hairpin
   debug_env
   loop_stats
 }
