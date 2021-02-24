@@ -37,6 +37,13 @@ Configuration can be done through environment variables, e.g., in the `docker-co
 # ...
 services:
   host:
+    ## From above:
+    image: benizi/host.docker.internal
+    cap_add: [NET_ADMIN, NET_RAW]
+    networks: { default: { aliases: [host.docker.internal] } }
+    restart: on-failure
+
+    ## Configuration
     environment:
       ## Set the destination ...
       # ... by IP
