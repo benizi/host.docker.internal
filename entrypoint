@@ -35,18 +35,18 @@ ensure_caps() {
 }
 
 # if `$HOST` is set, look up its IP for use as the destination
-set_ip_by_host() {
-  test -z "$IP" || return 0
+set_target_by_host() {
+  test -z "$TARGET" || return 0
   test -n "$HOST" || return 0
-  IP="$(getent ahostsv4 "$HOST" | awk '!seen[$1]++ { print $1 }')"
-  test -n "$IP" || die "Couldn't find (IPv4) address for HOST=[$HOST]"
+  TARGET="$(getent ahostsv4 "$HOST" | awk '!seen[$1]++ { print $1 }')"
+  test -n "$TARGET" || die "Couldn't find (IPv4) address for HOST=[$HOST]"
 }
 
 # print the IPv4 address of the default gateway
-set_ip_by_default_gateway() {
-  test -z "$IP" || return 0
-  IP="$(ip -4 route show default | awk '{ print $3 }')"
-  test -n "$IP" || die "Couldn't determine default gateway"
+set_target_by_default_gateway() {
+  test -z "$TARGET" || return 0
+  TARGET="$(ip -4 route show default | awk '{ print $3 }')"
+  test -n "$TARGET" || die "Couldn't determine default gateway"
 }
 
 # print the current host's IP
@@ -56,17 +56,18 @@ myip() {
   awk '$1 == "inet" { print $2 }'
 }
 
-# set `$IP` to the first of the following that is present:
+# set `$TARGET` to the first of the following that is present:
 # - `$IP` (can be passed in)
 # - IP address of `$HOST`
 # - IP address of default gateway
 # set default `$PORTS`
 set_destination() {
-  set_ip_by_host
-  set_ip_by_default_gateway
-  test -n "$IP" || die "Couldn't determine IP for forwarding"
+  : ${TARGET:=$IP}
+  set_target_by_host
+  set_target_by_default_gateway
+  test -n "$TARGET" || die "Couldn't determine IP for forwarding"
   : ${PORTS:=0:65535}
-  export IP PORTS
+  export TARGET PORTS
 }
 
 # set up forwarding rules for TCP and UDP traffic on the specified ports
@@ -74,7 +75,7 @@ start_forwarding() {
   echo $(hostname) $(myip)
   for port in $(echo $PORTS)
   do
-    echo FORWARDING IP=$IP PORTS=$port
+    echo FORWARDING TO TARGET=$TARGET PORTS=$port
     for proto in tcp udp
     do
       iptables \
@@ -83,7 +84,7 @@ start_forwarding() {
         --protocol $proto \
         --dport $port \
         --jump DNAT \
-        --to-destination $IP
+        --to-destination $TARGET
     done
   done
 }
