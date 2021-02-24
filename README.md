@@ -54,7 +54,10 @@ services:
       PORTS: 80:100,8800:8900
 
       ## Print `iptables` stats this frequently (default: `1h`)
+      # Should accept anything Alpine Linux `sleep` accepts
       STATS: 1m
+      # Don't print any stats:
+      # STATS: '0'
 
       ## Debugging options
       # Enable debugging (any non-empty value)
