@@ -63,6 +63,6 @@ services:
 
 # License
 
-Copyright © 2020 Benjamin R. Haskell
+Copyright © 2020–2021 Benjamin R. Haskell
 
 Distributed under the MIT License (included in file: [LICENSE](LICENSE)).
