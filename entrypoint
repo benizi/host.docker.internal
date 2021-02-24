@@ -89,7 +89,6 @@ set_destination() {
   set_target
   set_target_port
   : ${PORTS:=0:65535}
-  export TARGET PORTS
 }
 
 # set up forwarding rules for TCP and UDP traffic on the specified ports
