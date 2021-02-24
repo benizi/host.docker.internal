@@ -25,6 +25,10 @@ services:
     restart: on-failure
 ```
 
+- The capabilities in `cap_add` are required for `iptables`
+- The `networks` setting is optional, but that's the main reason this exists
+- The `restart` setting is probably overly cautious (shouldn't be any reason it would fail, but it doesn't hurt)
+
 ## Configuration
 
 Configuration can be done through environment variables, e.g., in the `docker-compose.yml` service:
