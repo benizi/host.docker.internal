@@ -36,6 +36,7 @@ ensure_caps() {
 
 # if `$HOST` is set, look up its IP for use as the destination
 set_ip_by_host() {
+  test -z "$IP" || return 0
   test -n "$HOST" || return 0
   IP="$(getent ahostsv4 "$HOST" | awk '!seen[$1]++ { print $1 }')"
   test -n "$IP" || die "Couldn't find (IPv4) address for HOST=[$HOST]"
@@ -43,6 +44,7 @@ set_ip_by_host() {
 
 # print the IPv4 address of the default gateway
 set_ip_by_default_gateway() {
+  test -z "$IP" || return 0
   IP="$(ip -4 route show default | awk '{ print $3 }')"
   test -n "$IP" || die "Couldn't determine default gateway"
 }
@@ -60,10 +62,9 @@ myip() {
 # - IP address of default gateway
 # set default `$PORTS`
 set_destination() {
-  test -n "$IP" ||
-  set_ip_by_host ||
-  set_ip_by_default_gateway ||
-  die "Couldn't determine IP for forwarding"
+  set_ip_by_host
+  set_ip_by_default_gateway
+  test -n "$IP" || die "Couldn't determine IP for forwarding"
   : ${PORTS:=0:65535}
   export IP PORTS
 }
