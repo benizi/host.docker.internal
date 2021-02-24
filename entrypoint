@@ -60,12 +60,16 @@ myip() {
 # - `$IP` (can be passed in)
 # - IP address of `$HOST`
 # - IP address of default gateway
-# set default `$PORTS`
-set_destination() {
+set_target() {
   : ${TARGET:=$IP}
   set_target_by_host
   set_target_by_default_gateway
   test -n "$TARGET" || die "Couldn't determine IP for forwarding"
+}
+
+# set up forwarding `$TARGET` and default `$PORTS`
+set_destination() {
+  set_target
   : ${PORTS:=0:65535}
   export TARGET PORTS
 }
