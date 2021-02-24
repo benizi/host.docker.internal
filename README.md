@@ -52,6 +52,8 @@ services:
       HOST: 'service.network.internal'
       # Forward these port ranges: (default: `0:65535`)
       PORTS: 80:100,8800:8900
+      # Optionally, route all traffic to a single port:
+      # TARGET_PORT: 8080 (or `DPORT` (D = destination) or `TPORT` (T = target))
 
       ## Print `iptables` stats this frequently (default: `1h`)
       # Should accept anything Alpine Linux `sleep` accepts
@@ -74,6 +76,8 @@ services:
   - [x] Specify forwarding IP via `$IP` (directly)
   - [x] Specify forwarding IP via `$HOST` (resolved in the container)
   - [x] Use default gateway IP otherwise
+- Reroute all traffic to a single port:
+  - [x] Specify target port via `$TARGET_PORT`
 
 # License
 
