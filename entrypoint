@@ -56,6 +56,23 @@ myip() {
   awk '$1 == "inet" { print $2 }'
 }
 
+# append the port if `$DPORT/TPORT/TARGET_PORT` is specified
+set_target_port() {
+  local tport used_vars var
+  for var in "DPORT=$DPORT" "TPORT=$TPORT" "TARGET_PORT=$TARGET_PORT"
+  do
+    case "$var" in
+      (*=) continue ;;
+    esac
+
+    used_vars="${used_vars} ${var}"
+    test -z "$tport" || die "More than one target port set:$used_vars"
+    tport=${var#*=}
+  done
+  test -n "$tport" || return 0
+  TARGET="${TARGET}:${tport}"
+}
+
 # set `$TARGET` to the first of the following that is present:
 # - `$IP` (can be passed in)
 # - IP address of `$HOST`
@@ -70,6 +87,7 @@ set_target() {
 # set up forwarding `$TARGET` and default `$PORTS`
 set_destination() {
   set_target
+  set_target_port
   : ${PORTS:=0:65535}
   export TARGET PORTS
 }
