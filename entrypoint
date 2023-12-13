@@ -159,5 +159,13 @@ main() {
   loop_stats
 }
 
-test $# -gt 0 || set -- main
+case "$1" in
+  (--debug) shift ;;
+  ('') set -- main ;;
+  (*)
+    printf 'host.docker.internal image ignoring command: [%s]\n' "$*" >&2
+    set -- main
+    ;;
+esac
+
 eval "$*"
